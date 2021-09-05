@@ -11,6 +11,7 @@ import createSagaMiddleware from 'redux-saga';
 import { takeEvery, put } from 'redux-saga/effects';
 import './index.css';
 
+
 // create the root Saga
 function* rootSaga() {
     // takeEvery SHOUTs go in here
@@ -61,6 +62,16 @@ const searchReducer = (state = {}, action) => {
             return state;
     }
 }
+
+const closeDataReducer = (state = [], action) => {
+    switch(action.type) {
+        case 'SET_CLOSE_DATA':
+            return action.payload;
+        default:
+            return state;
+    }
+}
+
 const favGifsReducer = (state = [], action) => {
     switch(action.type) {
         case 'SET_FAV_GIFS':
@@ -77,7 +88,7 @@ const sagaMiddleware = createSagaMiddleware();
 const storeInstance = createStore(
     combineReducers({
         searchReducer,
-        favGifsReducer
+        closeDataReducer
     }),
 
     // add logger and sagaMiddleware to our store

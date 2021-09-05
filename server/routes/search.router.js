@@ -28,15 +28,16 @@ router.post('/', (req, res) =>{
 router.get('/', (req, res) =>{
     let date = new Date();
     let today = Math.round(Date.now() / 1000);
+    console.log('params', req.query.symbol);
     console.log('today',today);
     axios({
         method: 'GET',
         url: 'https://finnhub.io/api/v1/stock/candle',
         params: {
             token: process.env.FIN_API_KEY,
-            symbol: 'AAPL',
+            symbol: req.query.symbol,
             resolution: 'D',
-            from: today - 604800,
+            from: today - 2629743,
             to: today,
         }
     }).then(apiRes => {

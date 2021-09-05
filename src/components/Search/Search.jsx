@@ -10,6 +10,8 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import axios from 'axios';
 
+import {Line} from 'react-chartjs-2';
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -27,7 +29,32 @@ export default function Search() {
     let [search, setSearch] = useState('');
     const classes = useStyles();
     const searchResult = useSelector(store => store.searchReducer);
-    const [candle, setCandle] = useState('');
+
+    const closeData = useSelector(store => store.closeDataReducer);
+    
+    const labelArray = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21];
+    const createLabels = () => {
+        let emptyLabel = [];
+        for (let i = 0; i < closeData.length; i++) {
+            emptyLabel.push(i+1);
+        };
+        return emptyLabel;
+    };
+
+    const ctx = {
+        labels: createLabels(),
+        datasets: [
+            {
+                label: 'Closing Price',
+                fill: false,
+                lineTension: 0.5,
+                backgroundColor: 'rgba(75,192,192,1)',
+                borderColor: 'rgba(0,0,0,1)',
+                borderWidth: 2,
+                data: closeData,
+            }
+        ]
+    }
 
 
     const searchOnClick = () => {
@@ -45,10 +72,12 @@ export default function Search() {
     }
 
     const getCandleGraph = () => {
-        axios.get('/api/search')
+        axios.get('/api/search', {params: {symbol: search}})
             .then(response => {
-                setCandle(response.data);
-                console.log('candle', candle);
+                dispatch({
+                    type: 'SET_CLOSE_DATA',
+                    payload: response.data.c,
+                })
             })
             .catch(err => {
                 console.error(err);
@@ -76,11 +105,26 @@ export default function Search() {
                         </AccordionSummary>
                         <AccordionDetails>
                             <ul>
-                                {/* <li>Change: ${searchResult.d}</li> */}
-                                <li>High Price of Day: ${searchResult.h}</li>
-                                <li>Low Price of Day: ${searchResult.l}</li>
+                                <li>High Price of the Day: ${searchResult.h}</li>
+                                <li>Low Price of the Day: ${searchResult.l}</li>
                                 <li>Open Price: ${searchResult.l}</li>
                                 <li>Previous Close: ${searchResult.pc}</li>
+                                <li>
+                                    <Line
+                                        data={ctx}
+                                        options={{
+                                            title:{
+                                                display:true,
+                                                text:'Closing Prices for last week',
+                                                fontSize: 20
+                                            },
+                                            legend:{
+                                                display: true,
+                                                position:'right'
+                                            }
+                                        }}
+                                    />
+                                </li>
                             </ul>
                         </AccordionDetails>
                     </Accordion>
